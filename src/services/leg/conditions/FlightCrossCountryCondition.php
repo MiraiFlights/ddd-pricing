@@ -8,6 +8,7 @@ final class FlightCrossCountryCondition implements FlightConditionInterface
 {
     public function isSatisfiedBy($value, FlightDecomposition $flight): bool
     {
-        return in_array($value, $flight->getRoute()->getCountriesOnTheWay());
+        $intersect = array_intersect($flight->getRoute()->getCountriesOnTheWay(), (array)$value['array']);
+        return (bool)$value['inverse'] xor !empty($intersect);
     }
 }
