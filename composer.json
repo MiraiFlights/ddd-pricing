@@ -1,5 +1,5 @@
 {
-  "name": "rubin/ddd-pricing",
+  "name": "ft/pricing-library",
   "description": "DDD aircraft pricing classes",
   "keywords": ["rubin", "ddd", "domain", "pricing"],
   "type": "library",

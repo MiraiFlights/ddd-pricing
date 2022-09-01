@@ -41,6 +41,10 @@ trait AircraftPricingFormatterTrait
                     $label = Yii::t('pricing', 'Arrival Airport');
                     $text = implode(', ', array_map([$this, 'asAirport'], $value['array']));
                     break;
+                case 'cross_country_iso3':
+                    $label = Yii::t('pricing', 'Cross Country');
+                    $text = implode(', ', array_map([$this, 'asCountry'], $value['array']));
+                    break;
                 case 'inner':
                     $label = Yii::t('pricing', 'Inner');
                     $text = $value ? Yii::t('pricing', 'Yes') : Yii::t('pricing', 'No');
