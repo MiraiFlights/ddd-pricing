@@ -11,13 +11,19 @@
     "unapi/helper-money": "^1.0",
     "rubin/enum": "^1.01",
     "psr/log": "^1.1",
-    "rubin/ddd-aviation": "^1.0.9",
     "rubin/ddd-uuid": "^1.0",
-    "rubin/adapter-guzzle": "^1.0"
+    "rubin/adapter-guzzle": "^1.0",
+    "rubin/ddd-aviation": "^1.1"
   },
   "autoload" : {
     "psr-4": {
       "ddd\\pricing\\": "src"
     }
-  }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:MiraiFlights/ddd-aviation.git"
+    }
+  ]
 }
