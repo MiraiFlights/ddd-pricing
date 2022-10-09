@@ -2,19 +2,19 @@
 
 namespace ddd\pricing\services\trip\extractors;
 
-use ddd\aviation\aggregates\TripDecomposition;
-use ddd\aviation\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 
 final class TripTripDaysCountExtractor implements TripExtractorInterface
 {
     public function extractValue(TripDecomposition $trip): int
     {
         return (int)floor(array_reduce(
-            $trip->getFlights(),
-            fn(float $carry, FlightDecomposition $flight) => $carry
-                + $flight->getRoute()->getTotalTime()->inHours()
-                + $flight->getParkingInterval()->inHours(),
-            0.0
-        ) / 24);
+                $trip->getFlights(),
+                fn(float $carry, FlightDecomposition $flight) => $carry
+                    + $flight->getRoute()->getTotalTime()->inHours()
+                    + $flight->getParkingInterval()->inHours(),
+                0.0
+            ) / 24);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace ddd\pricing\services\trip\extractors;
 
-use ddd\aviation\aggregates\TripDecomposition;
+use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 
 interface TripExtractorInterface
 {

@@ -2,7 +2,7 @@
 
 namespace ddd\pricing\services;
 
-use ddd\aviation\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 use ddd\pricing\entities\AircraftPricingCalculator;
 use ddd\pricing\services\leg;
 use unapi\helper\money\Currency;

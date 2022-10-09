@@ -2,7 +2,7 @@
 
 namespace ddd\pricing\services;
 
-use ddd\aviation\aggregates\TripDecomposition;
+use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 use ddd\pricing\entities\AircraftPricingCalculator;
 use ddd\pricing\interfaces\AircraftPricingHelperInterface;
 use ddd\pricing\services\trip\TripUnitExtractor;

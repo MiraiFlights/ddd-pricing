@@ -2,8 +2,8 @@
 
 namespace ddd\pricing\services\trip\extractors;
 
-use ddd\aviation\aggregates\FlightDecomposition;
-use ddd\aviation\aggregates\TripDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 
 final class TripMaxPaxCountExtractor implements TripExtractorInterface
 {

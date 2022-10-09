@@ -2,9 +2,9 @@
 
 namespace ddd\pricing\services\trip;
 
+use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 use ddd\pricing\exceptions\AircraftPricingCalculationException;
 use ddd\pricing\services\trip\extractors\TripExtractorInterface;
-use ddd\aviation\aggregates\TripDecomposition;
 use yii\base\Component;
 use yii\di\Instance;
 

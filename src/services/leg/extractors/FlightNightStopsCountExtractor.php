@@ -2,7 +2,7 @@
 
 namespace ddd\pricing\services\leg\extractors;
 
-use ddd\aviation\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 
 final class FlightNightStopsCountExtractor implements FlightExtractorInterface
 {
@@ -13,7 +13,7 @@ final class FlightNightStopsCountExtractor implements FlightExtractorInterface
         if ($hours < 4) {
             return 0;
         } else {
-            return ceil($hours / 24 );
+            return ceil($hours / 24);
         }
     }
 }

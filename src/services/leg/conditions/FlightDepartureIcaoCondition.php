@@ -2,7 +2,7 @@
 
 namespace ddd\pricing\services\leg\conditions;
 
-use ddd\aviation\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 
 final class FlightDepartureIcaoCondition implements FlightConditionInterface
 {

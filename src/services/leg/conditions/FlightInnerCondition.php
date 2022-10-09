@@ -2,7 +2,7 @@
 
 namespace ddd\pricing\services\leg\conditions;
 
-use ddd\aviation\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 use ddd\pricing\interfaces\AircraftPricingHelperInterface;
 
 final class FlightInnerCondition implements FlightConditionInterface

@@ -2,9 +2,9 @@
 
 namespace ddd\pricing\services\leg;
 
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 use ddd\pricing\exceptions\AircraftPricingCalculationException;
 use ddd\pricing\services\leg\extractors\FlightExtractorInterface;
-use ddd\aviation\aggregates\FlightDecomposition;
 use yii\base\Component;
 use yii\di\Instance;
 

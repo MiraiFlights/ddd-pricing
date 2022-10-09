@@ -2,10 +2,10 @@
 
 namespace ddd\pricing\services\leg;
 
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 use ddd\pricing\entities\AircraftPricingCalculator;
 use ddd\pricing\exceptions\AircraftPricingCalculationException;
 use ddd\pricing\services\leg\conditions\FlightConditionInterface;
-use ddd\aviation\aggregates\FlightDecomposition;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;

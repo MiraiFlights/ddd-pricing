@@ -2,13 +2,13 @@
 
 namespace ddd\pricing\services\leg\conditions;
 
-use ddd\aviation\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 
 final class FlightCrossCountryCondition implements FlightConditionInterface
 {
     public function isSatisfiedBy($value, FlightDecomposition $flight): bool
     {
-        $intersect = array_intersect(array_map(fn($country): string => $country->getValue(), $flight->getRoute()->getCountriesOnTheWay()), (array)$value['array']);
+        $intersect = array_intersect($flight->getRoute()->getCountriesOnTheWay()->asArray(), (array)$value['array']);
         return (bool)$value['inverse'] xor !empty($intersect);
     }
 }

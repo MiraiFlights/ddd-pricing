@@ -2,7 +2,7 @@
 
 namespace ddd\pricing\services\leg\extractors;
 
-use ddd\aviation\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 
 interface FlightExtractorInterface
 {

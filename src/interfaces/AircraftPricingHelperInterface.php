@@ -2,8 +2,8 @@
 
 namespace ddd\pricing\interfaces;
 
-use ddd\aviation\aggregates\FlightDecomposition;
-use ddd\aviation\aggregates\TripDecomposition;
+use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
+use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 use ddd\aviation\values\ICAO;
 use ddd\pricing\entities\AircraftPricingCalculator;
 
