@@ -4,6 +4,7 @@ namespace ddd\pricing\services;
 
 use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 use ddd\pricing\entities\AircraftPricingCalculator;
+use ddd\pricing\exceptions\AircraftPricingBadConfigurationException;
 use ddd\pricing\interfaces\AircraftPricingHelperInterface;
 use ddd\pricing\services\trip\TripUnitExtractor;
 use ddd\pricing\values;
@@ -30,6 +31,11 @@ final class TripCalculatorService
         $this->helper = $helper;
     }
 
+    /**
+     * @param TripDecomposition $trip
+     * @return DetailedPrice
+     * @throws AircraftPricingBadConfigurationException
+     */
     public function getPrice(TripDecomposition $trip): DetailedPrice
     {
         $details = ['flights' => [], 'trip' => [], 'tax' => []];
@@ -37,6 +43,8 @@ final class TripCalculatorService
         $taxable = 0;
 
         $calculators = iterator_to_array($this->helper->getActualCalculators($trip), false);
+        $this->guardAirwayTimeCalculatorExists($calculators);
+
         /** @var AircraftPricingCalculator[] $tripCalculators */
         $tripCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::TRIP);
         /** @var AircraftPricingCalculator[] $legCalculators */
@@ -107,5 +115,22 @@ final class TripCalculatorService
     private function extractPrice(TripDecomposition $trip, AircraftPricingCalculator $calculator): float
     {
         return $calculator->getProperties()->getPrice()->getAmount();
+    }
+
+    /**
+     * Защита от дурака #FT-2536
+     * @param AircraftPricingCalculator[] $calculators
+     * @return void
+     * @throws AircraftPricingBadConfigurationException
+     */
+    private function guardAirwayTimeCalculatorExists(array $calculators)
+    {
+        foreach ($calculators as $calculator)
+        {
+            if ($calculator->getProperties()->getUnit()->getValue() === values\AircraftPricingCalculatorUnit::AIRWAY_TIME)
+                return;
+        }
+
+        throw new AircraftPricingBadConfigurationException();
     }
 }

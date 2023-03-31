@@ -4,7 +4,7 @@ namespace ddd\pricing\exceptions;
 
 use ddd\domain\exceptions\DomainServiceExceptionInterface;
 
-final class AircraftPricingCalculationException extends \RuntimeException implements DomainServiceExceptionInterface
+class AircraftPricingCalculationException extends \RuntimeException implements DomainServiceExceptionInterface
 {
     public $message = 'AIRCRAFT_PRICING_PROFILE_CALCULATION_ERROR';
 }
