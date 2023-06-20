@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace ddd\pricing\services\leg;
+namespace ddd\pricing\services;
 
 use ddd\pricing\exceptions\AircraftPricingCalculationException;
 
-final class FlightFiltersChecker
+final class FiltersChecker
 {
     public function checkCalculatorFilters($value, array $filter): bool
     {

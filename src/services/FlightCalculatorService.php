@@ -11,20 +11,20 @@ use unapi\helper\money\MoneyAmount;
 final class FlightCalculatorService
 {
     private leg\FlightConditionsChecker $conditionsChecker;
-    private leg\FlightFiltersChecker $filtersChecker;
     private leg\FlightUnitExtractor $unitExtractor;
+    private FiltersChecker $filtersChecker;
     private AircraftPricingCalculatorRoundService $roundService;
 
     public function __construct(
         leg\FlightConditionsChecker           $flightConditionsChecker,
-        leg\FlightFiltersChecker              $flightFiltersChecker,
         leg\FlightUnitExtractor               $flightUnitExtractor,
+        FiltersChecker                        $flightFiltersChecker,
         AircraftPricingCalculatorRoundService $roundService
     )
     {
         $this->conditionsChecker = $flightConditionsChecker;
-        $this->filtersChecker = $flightFiltersChecker;
         $this->unitExtractor = $flightUnitExtractor;
+        $this->filtersChecker = $flightFiltersChecker;
         $this->roundService = $roundService;
     }
 

@@ -15,18 +15,21 @@ final class TripCalculatorService
 {
     private FlightCalculatorService $flightCalculatorService;
     private TripUnitExtractor $unitExtractor;
+    private FiltersChecker $filtersChecker;
     private AircraftPricingCalculatorRoundService $roundService;
     private AircraftPricingHelperInterface $helper;
 
     public function __construct(
         FlightCalculatorService               $flightCalculatorService,
         TripUnitExtractor                     $unitExtractor,
+        FiltersChecker                        $filtersChecker,
         AircraftPricingCalculatorRoundService $roundService,
         AircraftPricingHelperInterface        $helper
     )
     {
         $this->flightCalculatorService = $flightCalculatorService;
         $this->unitExtractor = $unitExtractor;
+        $this->filtersChecker = $filtersChecker;
         $this->roundService = $roundService;
         $this->helper = $helper;
     }
@@ -79,6 +82,9 @@ final class TripCalculatorService
         $tripPrice = array_reduce(
             $tripCalculators,
             function (float $initial, AircraftPricingCalculator $tripCalculator) use ($trip, &$details, &$taxable, &$tax) {
+                if (!$this->checkCalculatorFilters($trip, $tripCalculator))
+                    return $initial;
+
                 $amount = $this->extractPrice($trip, $tripCalculator) * $this->roundService->applyRoundMethod(
                         $this->unitExtractor->extractUnit($trip, $tripCalculator->getProperties()->getUnit()->getValue()),
                         $tripCalculator->getProperties()->getRound()->getValue()
@@ -117,6 +123,17 @@ final class TripCalculatorService
         return $calculator->getProperties()->getPrice()->getAmount();
     }
 
+    private function checkCalculatorFilters(TripDecomposition $trip, AircraftPricingCalculator $calculator): bool
+    {
+        foreach ($calculator->getProperties()->getFilters() as $filter) {
+            $value = $this->unitExtractor->extractUnit($trip, $filter['unit']);
+
+            if (!$this->filtersChecker->checkCalculatorFilters($value, $filter))
+                return false;
+        }
+        return true;
+    }
+
     /**
      * Защита от дурака #FT-2536
      * @param AircraftPricingCalculator[] $calculators
@@ -125,8 +142,7 @@ final class TripCalculatorService
      */
     private function guardAirwayTimeCalculatorExists(array $calculators)
     {
-        foreach ($calculators as $calculator)
-        {
+        foreach ($calculators as $calculator) {
             if ($calculator->getProperties()->getUnit()->getValue() === values\AircraftPricingCalculatorUnit::AIRWAY_TIME)
                 return;
         }
