@@ -55,6 +55,7 @@ final class AircraftPricingBootstrap implements BootstrapInterface
                     'home_days' => 'ddd\pricing\services\trip\extractors\TripHomeDaysCountExtractor',
                     'trip_pax' => 'ddd\pricing\services\trip\extractors\TripMaxPaxCountExtractor',
                     'crew_swap' => 'ddd\pricing\services\trip\extractors\TripCrewSwapCountExtractor',
+                    'flight_ttl' => 'ddd\pricing\services\trip\extractors\TripFlightTtlExtractor',
                 ]
             ],
         ]);

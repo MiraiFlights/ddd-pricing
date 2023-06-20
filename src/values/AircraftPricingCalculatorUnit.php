@@ -27,6 +27,7 @@ final class AircraftPricingCalculatorUnit extends Enum
     const HOME_DAYS = 'home_days';
     const TRIP_PAX = 'trip_pax';
     const CREW_SWAP = 'crew_swap';
+    // const FLIGHT_TTL = 'flight_ttl'; same name
 
     // for tax
     const PERCENT = 'percent';
