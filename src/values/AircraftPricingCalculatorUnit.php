@@ -28,6 +28,9 @@ final class AircraftPricingCalculatorUnit extends Enum
     const TRIP_PAX = 'trip_pax';
     const CREW_SWAP = 'crew_swap';
     // const FLIGHT_TTL = 'flight_ttl'; same name
+    const LEGS_COUNT = 'legs_count';
+    const FERRY_LEGS_COUNT = 'ferry_legs_count';
+    const TAXI_LEGS_COUNT = 'taxi_legs_count';
 
     // for tax
     const PERCENT = 'percent';

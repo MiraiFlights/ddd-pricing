@@ -2,6 +2,7 @@
 
 namespace ddd\pricing;
 
+use ddd\pricing\values\AircraftPricingCalculatorUnit;
 use yii\base\Application;
 use yii\base\BootstrapInterface;
 
@@ -32,30 +33,33 @@ final class AircraftPricingBootstrap implements BootstrapInterface
             'ddd\pricing\services\leg\FlightUnitExtractor' => [
                 'class' => 'ddd\pricing\services\leg\FlightUnitExtractor',
                 'extractors' => [
-                    'airway_time' => 'ddd\pricing\services\leg\extractors\FlightAirwayTimeExtractor',
-                    'refuel_time' => 'ddd\pricing\services\leg\extractors\FlightRefuelTimeExtractor',
-                    'total_time' => 'ddd\pricing\services\leg\extractors\FlightTotalTimeExtractor',
-                    'leg' => 'ddd\pricing\services\leg\extractors\FlightLegCountExtractor',
-                    'pax' => 'ddd\pricing\services\leg\extractors\FlightPaxExtractor',
-                    'luggage' => 'ddd\pricing\services\leg\extractors\FlightLuggageExtractor',
-                    'takeoff' => 'ddd\pricing\services\leg\extractors\FlightTakeoffCountExtractor',
-                    'landing' => 'ddd\pricing\services\leg\extractors\FlightLandingCountExtractor',
-                    'night_stop' => 'ddd\pricing\services\leg\extractors\FlightNightStopsCountExtractor',
-                    'parking_days' => 'ddd\pricing\services\leg\extractors\FlightParkingDaysCountExtractor',
-                    'fuel_stops' => 'ddd\pricing\services\leg\extractors\FlightFuelStopsCountExtractor',
-                    'flight_ttl' => 'ddd\pricing\services\leg\extractors\FlightTtlExtractor',
+                    AircraftPricingCalculatorUnit::AIRWAY_TIME => 'ddd\pricing\services\leg\extractors\FlightAirwayTimeExtractor',
+                    AircraftPricingCalculatorUnit::REFUEL_TIME => 'ddd\pricing\services\leg\extractors\FlightRefuelTimeExtractor',
+                    AircraftPricingCalculatorUnit::TOTAL_TIME => 'ddd\pricing\services\leg\extractors\FlightTotalTimeExtractor',
+                    AircraftPricingCalculatorUnit::LEG => 'ddd\pricing\services\leg\extractors\FlightLegCountExtractor',
+                    AircraftPricingCalculatorUnit::PAX => 'ddd\pricing\services\leg\extractors\FlightPaxExtractor',
+                    AircraftPricingCalculatorUnit::LUGGAGE => 'ddd\pricing\services\leg\extractors\FlightLuggageExtractor',
+                    AircraftPricingCalculatorUnit::TAKEOFF => 'ddd\pricing\services\leg\extractors\FlightTakeoffCountExtractor',
+                    AircraftPricingCalculatorUnit::LANDING => 'ddd\pricing\services\leg\extractors\FlightLandingCountExtractor',
+                    AircraftPricingCalculatorUnit::NIGHT_STOP => 'ddd\pricing\services\leg\extractors\FlightNightStopsCountExtractor',
+                    AircraftPricingCalculatorUnit::PARKING_DAYS => 'ddd\pricing\services\leg\extractors\FlightParkingDaysCountExtractor',
+                    AircraftPricingCalculatorUnit::FUEL_STOPS => 'ddd\pricing\services\leg\extractors\FlightFuelStopsCountExtractor',
+                    AircraftPricingCalculatorUnit::FLIGHT_TTL => 'ddd\pricing\services\leg\extractors\FlightTtlExtractor',
                 ]
             ],
             'ddd\pricing\services\trip\TripUnitExtractor' => [
                 'class' => 'ddd\pricing\services\trip\TripUnitExtractor',
                 'extractors' => [
-                    'startup' => 'ddd\pricing\services\trip\extractors\TripStartupCountExtractor',
-                    'trip_days' => 'ddd\pricing\services\trip\extractors\TripTripDaysCountExtractor',
-                    'flight_days' => 'ddd\pricing\services\trip\extractors\TripFlightDaysCountExtractor',
-                    'home_days' => 'ddd\pricing\services\trip\extractors\TripHomeDaysCountExtractor',
-                    'trip_pax' => 'ddd\pricing\services\trip\extractors\TripMaxPaxCountExtractor',
-                    'crew_swap' => 'ddd\pricing\services\trip\extractors\TripCrewSwapCountExtractor',
-                    'flight_ttl' => 'ddd\pricing\services\trip\extractors\TripFlightTtlExtractor',
+                    AircraftPricingCalculatorUnit::STARTUP => 'ddd\pricing\services\trip\extractors\TripStartupCountExtractor',
+                    AircraftPricingCalculatorUnit::TRIP_DAYS => 'ddd\pricing\services\trip\extractors\TripTripDaysCountExtractor',
+                    AircraftPricingCalculatorUnit::FLIGHT_DAYS => 'ddd\pricing\services\trip\extractors\TripFlightDaysCountExtractor',
+                    AircraftPricingCalculatorUnit::HOME_DAYS => 'ddd\pricing\services\trip\extractors\TripHomeDaysCountExtractor',
+                    AircraftPricingCalculatorUnit::TRIP_PAX => 'ddd\pricing\services\trip\extractors\TripMaxPaxCountExtractor',
+                    AircraftPricingCalculatorUnit::CREW_SWAP => 'ddd\pricing\services\trip\extractors\TripCrewSwapCountExtractor',
+                    AircraftPricingCalculatorUnit::FLIGHT_TTL => 'ddd\pricing\services\trip\extractors\TripFlightTtlExtractor',
+                    AircraftPricingCalculatorUnit::LEGS_COUNT => 'ddd\pricing\services\trip\extractors\TripLegsCountExtractor',
+                    AircraftPricingCalculatorUnit::FERRY_LEGS_COUNT => 'ddd\pricing\services\trip\extractors\TripFerryLegsCountExtractor',
+                    AircraftPricingCalculatorUnit::TAXI_LEGS_COUNT => 'ddd\pricing\services\trip\extractors\TripTaxiLegsCountExtractor',
                 ]
             ],
         ]);
