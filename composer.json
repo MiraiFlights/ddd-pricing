@@ -21,20 +21,8 @@
   },
   "repositories": [
     {
-      "type": "vcs",
-      "url": "git@github.com:MiraiFlights/ddd-adapter.git"
-    },
-    {
-      "type": "vcs",
-      "url": "git@github.com:MiraiFlights/ddd-aviation.git"
-    },
-    {
-      "type": "vcs",
-      "url": "git@github.com:MiraiFlights/ddd-common.git"
-    },
-    {
-      "type": "vcs",
-      "url": "git@github.com:MiraiFlights/ddd-distance.git"
+      "type": "composer",
+      "url": "https://satis.mirai.services"
     }
   ]
 }
