@@ -12,7 +12,7 @@
     "rubin/enum": "^1.0",
     "psr/log": "^1.1",
     "rubin/ddd-uuid": "^1.0",
-    "ft/ddd-adapter": "^2.1"
+    "ft/ddd-adapter": "^3.0"
   },
   "autoload" : {
     "psr-4": {

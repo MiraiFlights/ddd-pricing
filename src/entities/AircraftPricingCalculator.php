@@ -46,8 +46,7 @@ final class AircraftPricingCalculator implements \JsonSerializable
         return $this->properties;
     }
 
-   #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return array_merge(
             [
