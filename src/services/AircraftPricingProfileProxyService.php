@@ -21,7 +21,6 @@ use rubin\adapter\guzzle\GuzzleClientFabricInterface;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
-use function GuzzleHttp\json_decode;
 
 final class AircraftPricingProfileProxyService extends Component implements AircraftPricingProfileProxyServiceInterface, LoggerAwareInterface
 {

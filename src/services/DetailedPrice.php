@@ -55,6 +55,7 @@ final class DetailedPrice extends MoneyAmount implements \JsonSerializable
         return $this->details[$key] ?? null;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize ()
     {
         return [

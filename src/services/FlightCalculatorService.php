@@ -4,7 +4,6 @@ namespace ddd\pricing\services;
 
 use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 use ddd\pricing\entities\AircraftPricingCalculator;
-use ddd\pricing\services\leg;
 use unapi\helper\money\Currency;
 use unapi\helper\money\MoneyAmount;
 

@@ -5,11 +5,11 @@
   "type": "library",
   "minimum-stability": "stable",
   "require": {
-    "php": ">=7.4.0",
+    "php": ">=8.0",
     "ext-json": "*",
     "rubin/ddd-domain": "^1.0",
     "unapi/helper-money": "^1.0",
-    "rubin/enum": "^1.01",
+    "rubin/enum": "^1.0",
     "psr/log": "^1.1",
     "rubin/ddd-uuid": "^1.0",
     "ft/ddd-adapter": "^2.1"
