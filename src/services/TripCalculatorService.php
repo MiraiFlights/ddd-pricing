@@ -10,6 +10,7 @@ use ddd\pricing\services\trip\TripUnitExtractor;
 use ddd\pricing\values;
 use ddd\pricing\values\AircraftPricingCalculatorType;
 use unapi\helper\money\Currency;
+use unapi\helper\money\MoneyAmount;
 
 final class TripCalculatorService
 {
@@ -36,10 +37,11 @@ final class TripCalculatorService
 
     /**
      * @param TripDecomposition $trip
+     * @param MoneyAmount|null $minPrice
      * @return DetailedPrice
      * @throws AircraftPricingBadConfigurationException
      */
-    public function getPrice(TripDecomposition $trip): DetailedPrice
+    public function getPrice(TripDecomposition $trip, ?MoneyAmount $minPrice = null): DetailedPrice
     {
         $details = ['flights' => [], 'trip' => [], 'tax' => []];
         $legsPrice = 0;
@@ -115,7 +117,11 @@ final class TripCalculatorService
             0.0
         );
 
-        return (new DetailedPrice(floor($legsPrice + $tripPrice + $taxPrice), new Currency(Currency::EUR)))->setDetails($details);
+        $result = floor($legsPrice + $tripPrice + $taxPrice);
+        if ($minPrice && ($result < $minPrice->getAmount()))
+            $result = $minPrice->getAmount();
+
+        return (new DetailedPrice($result, new Currency(Currency::EUR)))->setDetails($details);
     }
 
     private function extractPrice(TripDecomposition $trip, AircraftPricingCalculator $calculator): float
