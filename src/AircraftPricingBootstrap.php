@@ -45,6 +45,8 @@ final class AircraftPricingBootstrap implements BootstrapInterface
                     AircraftPricingCalculatorUnit::PARKING_DAYS => 'ddd\pricing\services\leg\extractors\FlightParkingDaysCountExtractor',
                     AircraftPricingCalculatorUnit::FUEL_STOPS => 'ddd\pricing\services\leg\extractors\FlightFuelStopsCountExtractor',
                     AircraftPricingCalculatorUnit::FLIGHT_TTL => 'ddd\pricing\services\leg\extractors\FlightTtlExtractor',
+                    AircraftPricingCalculatorUnit::AIRWAY_DISTANCE_KM => 'ddd\pricing\services\leg\extractors\FlightAirwayDistanceKmExtractor',
+                    AircraftPricingCalculatorUnit::AIRWAY_DISTANCE_NM => 'ddd\pricing\services\leg\extractors\FlightAirwayDistanceNmExtractor',
                 ]
             ],
             'ddd\pricing\services\trip\TripUnitExtractor' => [
