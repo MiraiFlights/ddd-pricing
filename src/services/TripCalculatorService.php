@@ -62,6 +62,7 @@ final class TripCalculatorService
         foreach ($trip->getFlights() as $flight) {
             $flightDetails = ['calculators' => []];
             $legPrice = 0;
+            $legTaxable = 0;
             foreach ($legCalculators as $legCalculator) {
                 $price = $this->flightCalculatorService->calculatePrice($flight, $legCalculator);
                 if (null === $price)
@@ -69,6 +70,7 @@ final class TripCalculatorService
 
                 switch ($legCalculator->getProperties()->getTax()->getValue()) {
                     case values\AircraftPricingCalculatorTax::IS_TAXABLE:
+                        $legTaxable += $price->getAmount();
                         $taxable += $price->getAmount();
                         break;
                     case values\AircraftPricingCalculatorTax::IS_TAX:
@@ -80,15 +82,17 @@ final class TripCalculatorService
                 $legPrice += $price->getAmount();
             }
 
-            $marginPrice = 0;
-            foreach ($legMarginCalculators as $legMarginCalculator) {
-                $margin = $this->flightCalculatorService->calculateMargin($flight, $legMarginCalculator, new MoneyAmount($legPrice, new Currency(Currency::EUR)));
-                if (null === $margin)
-                    continue;
-                $marginPrice += $margin->getAmount();
-                $flightDetails['calculators'][] = DetailedPrice::fromMoneyAmount($margin)->setDetails($legMarginCalculator->jsonSerialize());
+            if ($legTaxable > 0) {
+                $marginPrice = 0;
+                foreach ($legMarginCalculators as $legMarginCalculator) {
+                    $margin = $this->flightCalculatorService->calculateMargin($flight, $legMarginCalculator, new MoneyAmount($legTaxable, new Currency(Currency::EUR)));
+                    if (null === $margin)
+                        continue;
+                    $marginPrice += $margin->getAmount();
+                    $flightDetails['calculators'][] = DetailedPrice::fromMoneyAmount($margin)->setDetails($legMarginCalculator->jsonSerialize());
+                }
+                $legPrice += $marginPrice;
             }
-            $legPrice += $marginPrice;
 
             $legsPrice += $legPrice;
             $details['flights'][] = (new DetailedPrice($legPrice, new Currency(Currency::EUR)))->setDetails($flightDetails);
