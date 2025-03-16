@@ -50,12 +50,14 @@ final class TripCalculatorService
         $calculators = iterator_to_array($this->helper->getActualCalculators($trip), false);
         $this->guardAirwayTimeCalculatorExists($calculators);
 
-        /** @var AircraftPricingCalculator[] $tripCalculators */
-        $tripCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::TRIP);
         /** @var AircraftPricingCalculator[] $legCalculators */
         $legCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::LEG);
-        /** @var AircraftPricingCalculator[] $taxCalculators */
-        $taxCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::TAX);
+        /** @var AircraftPricingCalculator[] $legMarginCalculators */
+        $legMarginCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::LEG_MARGIN);
+        /** @var AircraftPricingCalculator[] $tripCalculators */
+        $tripCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::TRIP);
+        /** @var AircraftPricingCalculator[] $tripMarginCalculators */
+        $tripMarginCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::TRIP_MARGIN);
 
         foreach ($trip->getFlights() as $flight) {
             $flightDetails = ['calculators' => []];
@@ -77,6 +79,15 @@ final class TripCalculatorService
                 $flightDetails['calculators'][] = DetailedPrice::fromMoneyAmount($price)->setDetails($legCalculator->jsonSerialize());
                 $legPrice += $price->getAmount();
             }
+
+            $marginPrice = 0;
+            foreach ($legMarginCalculators as $legMarginCalculator) {
+                $margin = $this->flightCalculatorService->calculateMargin($flight, $legMarginCalculator, new MoneyAmount($legPrice, new Currency(Currency::EUR)));
+                $marginPrice += $margin->getAmount();
+                $flightDetails['calculators'][] = DetailedPrice::fromMoneyAmount($margin)->setDetails($legMarginCalculator->jsonSerialize());
+            }
+            $legPrice += $marginPrice;
+
             $legsPrice += $legPrice;
             $details['flights'][] = (new DetailedPrice($legPrice, new Currency(Currency::EUR)))->setDetails($flightDetails);
         }
@@ -108,7 +119,7 @@ final class TripCalculatorService
         );
 
         $taxPrice = array_reduce(
-            $taxCalculators,
+            $tripMarginCalculators,
             function (float $initial, AircraftPricingCalculator $taxCalculator) use ($trip, &$details, $taxable) {
                 $amount = $this->extractPrice($trip, $taxCalculator) * $taxable / 100;
                 $details['tax'][] = (new DetailedPrice($amount, new Currency(Currency::EUR)))->setDetails($taxCalculator->jsonSerialize());

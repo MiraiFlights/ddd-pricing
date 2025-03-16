@@ -10,9 +10,10 @@ final class AircraftPricingProfileCalculatorTypeMapper
     public static function getDefinitions(): array
     {
         return [
-            AircraftPricingCalculatorType::LEG => 'Leg',
-            AircraftPricingCalculatorType::TRIP => 'Trip',
-            AircraftPricingCalculatorType::TAX => 'Tax',
+            AircraftPricingCalculatorType::LEG => 'Leg price',
+            AircraftPricingCalculatorType::LEG_MARGIN => 'Leg margin',
+            AircraftPricingCalculatorType::TRIP => 'Trip price',
+            AircraftPricingCalculatorType::TRIP_MARGIN => 'Trip margin',
         ];
     }
 

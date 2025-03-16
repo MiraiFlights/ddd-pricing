@@ -42,6 +42,19 @@ final class FlightCalculatorService
         return new MoneyAmount($price, new Currency(Currency::EUR));
     }
 
+    public function calculateMargin(FlightDecomposition $flight, AircraftPricingCalculator $calculator, MoneyAmount $sourcePrice): ?MoneyAmount
+    {
+        if (!$this->conditionsChecker->checkCalculatorConditions($flight, $calculator))
+            return null;
+        if (!$this->checkCalculatorFilters($flight, $calculator))
+            return null;
+
+        return new MoneyAmount(
+            $sourcePrice->getAmount() * $this->extractPrice($flight, $calculator) / 100,
+            $sourcePrice->getCurrency()
+        );
+    }
+
     private function checkCalculatorFilters(FlightDecomposition $flight, AircraftPricingCalculator $calculator): bool
     {
         foreach ($calculator->getProperties()->getFilters() as $filter) {

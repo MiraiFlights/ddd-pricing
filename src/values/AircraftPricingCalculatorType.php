@@ -8,5 +8,6 @@ final class AircraftPricingCalculatorType extends Enum
 {
     const LEG = 0;
     const TRIP = 1;
-    const TAX = 2;
+    const TRIP_MARGIN = 2;
+    const LEG_MARGIN = 3;
 }
