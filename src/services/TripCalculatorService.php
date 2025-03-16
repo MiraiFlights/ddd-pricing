@@ -83,6 +83,8 @@ final class TripCalculatorService
             $marginPrice = 0;
             foreach ($legMarginCalculators as $legMarginCalculator) {
                 $margin = $this->flightCalculatorService->calculateMargin($flight, $legMarginCalculator, new MoneyAmount($legPrice, new Currency(Currency::EUR)));
+                if (null === $margin)
+                    continue;
                 $marginPrice += $margin->getAmount();
                 $flightDetails['calculators'][] = DetailedPrice::fromMoneyAmount($margin)->setDetails($legMarginCalculator->jsonSerialize());
             }
