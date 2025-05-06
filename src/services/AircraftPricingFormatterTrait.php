@@ -57,6 +57,10 @@ trait AircraftPricingFormatterTrait
                     $label = Yii::t('pricing', 'Weekends');
                     $text = $value ? Yii::t('pricing', 'Yes') : Yii::t('pricing', 'No');
                     break;
+                case 'flags':
+                    $label = Yii::t('pricing', 'Flags');
+                    $text = implode(', ', $value['array']);
+                    break;
                 default:
                     $label = ucfirst($name);
                     $text = $value;
