@@ -61,6 +61,14 @@ trait AircraftPricingFormatterTrait
                     $label = Yii::t('pricing', 'Flags');
                     $text = implode(', ', $value['array']);
                     break;
+                case 'aircraft_type_id':
+                    $label = Yii::t('pricing', 'Aircraft Type');
+                    $text = implode(', ', array_map([$this, 'asAircraftType'], $value['array']));
+                    break;
+                case 'aircraft_class_id':
+                    $label = Yii::t('pricing', 'Aircraft Class');
+                    $text = implode(', ', array_map([$this, 'asAircraftClass'], $value['array']));
+                    break;
                 default:
                     $label = ucfirst($name);
                     $text = $value;

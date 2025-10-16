@@ -29,6 +29,8 @@ final class AircraftPricingBootstrap implements BootstrapInterface
                     'arrival_country_iso3' => 'ddd\pricing\services\leg\conditions\FlightArrivalCountryCondition',
                     'cross_country_iso3' => 'ddd\pricing\services\leg\conditions\FlightCrossCountryCondition',
                     'flags' => 'ddd\pricing\services\leg\conditions\FlightFlagsCondition',
+                    'aircraft_type_id' => 'ddd\pricing\services\leg\conditions\FlightAircraftTypeCondition',
+                    'aircraft_class_id' => 'ddd\pricing\services\leg\conditions\FlightAircraftClassCondition',
                 ]
             ],
             'ddd\pricing\services\leg\FlightUnitExtractor' => [
