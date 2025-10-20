@@ -18,7 +18,7 @@ final class FlightAircraftClassCondition implements FlightConditionInterface
         $result = in_array(
             $this->aircraftTypeRepository->oneByAircraftTypeId(
                 $flight->getAircraft()->getProperties()->getAircraftTypeId()
-            )->getId()->getValue(),
+            )->getProperties()->getAircraftClassId()?->getValue(),
             (array)$value['array']
         );
         return (bool)$value['inverse'] ? !$result : $result;
