@@ -24,5 +24,14 @@
       "type": "composer",
       "url": "https://satis.mirai.services"
     }
-  ]
+  ],
+  "require-dev": {
+    "yidas/yii2-composer-bower-skip": "^2.0",
+    "yiisoft/yii2": "^2.0.13"
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true
+    }
+  }
 }

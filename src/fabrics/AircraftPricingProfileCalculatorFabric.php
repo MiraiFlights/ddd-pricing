@@ -5,7 +5,6 @@ namespace ddd\pricing\fabrics;
 use ddd\pricing\entities;
 use ddd\pricing\mappers\AircraftPricingProfileCalculatorTypeMapper;
 use ddd\pricing\values;
-use unapi\helper\money\Currency;
 use unapi\helper\money\MoneyAmount;
 use yii\helpers\ArrayHelper;
 
@@ -29,19 +28,27 @@ final class AircraftPricingProfileCalculatorFabric
      */
     public function fromData($data): entities\AircraftPricingCalculator
     {
+        $type = values\AircraftPricingCalculatorType::fromValue(AircraftPricingProfileCalculatorTypeMapper::webToCore(ArrayHelper::getValue($data, 'type')));
+        $properties = (new values\AircraftPricingCalculatorProperties(
+            $type,
+            new values\AircraftPricingCalculatorName((string)ArrayHelper::getValue($data, 'name')),
+            ArrayHelper::getValue($data, 'settings.conditions', []),
+            ArrayHelper::getValue($data, 'settings.filters', []),
+            values\AircraftPricingCalculatorUnit::fromValue(ArrayHelper::getValue($data, 'settings.unit')),
+            values\AircraftPricingCalculatorTax::fromValue(ArrayHelper::getValue($data, 'settings.tax', values\AircraftPricingCalculatorTax::NONE)),
+            values\AircraftPricingCalculatorRound::fromValue(ArrayHelper::getValue($data, 'settings.round', values\AircraftPricingCalculatorRound::NONE))
+        ))
+            ->setAircraftPricingProfileID(new values\AircraftPricingProfileID(ArrayHelper::getValue($data, 'pricing_profile_id')));
+
+       if (in_array($type->getValue(), [values\AircraftPricingCalculatorType::LEG, values\AircraftPricingCalculatorType::TRIP])) {
+            $properties->setPrice(new MoneyAmount((float)ArrayHelper::getValue($data, 'price'), ArrayHelper::getValue($data, 'currency')));
+        } else {
+           $properties->setPercent(ArrayHelper::getValue($data, 'percent'));
+       }
+
         return entities\AircraftPricingCalculator::load(
             new values\AircraftPricingCalculatorID(ArrayHelper::getValue($data, 'id')),
-            (new values\AircraftPricingCalculatorProperties(
-                values\AircraftPricingCalculatorType::fromValue(AircraftPricingProfileCalculatorTypeMapper::webToCore(ArrayHelper::getValue($data, 'type'))),
-                new values\AircraftPricingCalculatorName((string)ArrayHelper::getValue($data, 'name')),
-                ArrayHelper::getValue($data, 'settings.conditions', []),
-                ArrayHelper::getValue($data, 'settings.filters', []),
-                values\AircraftPricingCalculatorUnit::fromValue(ArrayHelper::getValue($data, 'settings.unit')),
-                values\AircraftPricingCalculatorTax::fromValue(ArrayHelper::getValue($data, 'settings.tax', values\AircraftPricingCalculatorTax::NONE)),
-                values\AircraftPricingCalculatorRound::fromValue(ArrayHelper::getValue($data, 'settings.round', values\AircraftPricingCalculatorRound::NONE)),
-                new MoneyAmount((float)ArrayHelper::getValue($data, 'price'), new Currency(Currency::EUR))
-            ))
-                ->setAircraftPricingProfileID(new values\AircraftPricingProfileID(ArrayHelper::getValue($data, 'pricing_profile_id')))
+            $properties
         );
     }
 }

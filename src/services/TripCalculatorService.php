@@ -6,63 +6,47 @@ use ddd\adapter\Trip\domain\aggregates\TripDecomposition;
 use ddd\pricing\entities\AircraftPricingCalculator;
 use ddd\pricing\exceptions\AircraftPricingBadConfigurationException;
 use ddd\pricing\interfaces\AircraftPricingHelperInterface;
+use ddd\pricing\services\guards\TripCalculatorGuards;
 use ddd\pricing\services\trip\TripUnitExtractor;
 use ddd\pricing\values;
 use ddd\pricing\values\AircraftPricingCalculatorType;
-use unapi\helper\money\Currency;
-use unapi\helper\money\MoneyAmount;
+use unapi\helper\money\Wallet;
 
 final class TripCalculatorService
 {
-    private FlightCalculatorService $flightCalculatorService;
-    private TripUnitExtractor $unitExtractor;
-    private FiltersChecker $filtersChecker;
-    private AircraftPricingCalculatorRoundService $roundService;
-    private AircraftPricingHelperInterface $helper;
-
     public function __construct(
-        FlightCalculatorService               $flightCalculatorService,
-        TripUnitExtractor                     $unitExtractor,
-        FiltersChecker                        $filtersChecker,
-        AircraftPricingCalculatorRoundService $roundService,
-        AircraftPricingHelperInterface        $helper
+        private readonly FlightCalculatorService               $flightCalculatorService,
+        private readonly TripUnitExtractor                     $unitExtractor,
+        private readonly FiltersChecker                        $filtersChecker,
+        private readonly AircraftPricingCalculatorRoundService $roundService,
+        private readonly AircraftPricingHelperInterface        $helper
     )
     {
-        $this->flightCalculatorService = $flightCalculatorService;
-        $this->unitExtractor = $unitExtractor;
-        $this->filtersChecker = $filtersChecker;
-        $this->roundService = $roundService;
-        $this->helper = $helper;
     }
 
     /**
      * @param TripDecomposition $trip
-     * @param MoneyAmount|null $minPrice
-     * @return DetailedPrice
+     * @return DetailedWallet
      * @throws AircraftPricingBadConfigurationException
      */
-    public function getPrice(TripDecomposition $trip, ?MoneyAmount $minPrice = null): DetailedPrice
+    public function getPrice(TripDecomposition $trip): DetailedWallet
     {
-        $details = ['flights' => [], 'trip' => [], 'tax' => []];
-        $legsPrice = 0;
-        $taxable = 0;
+        $details = ['flights' => [], 'trip' => [], 'tax' => [], 'datetime' => date('Y-m-d H:i:s')];
+        $legsPrice = new Wallet();
+        $taxable = new Wallet();
 
         $calculators = iterator_to_array($this->helper->getActualCalculators($trip), false);
-        $this->guardAirwayTimeCalculatorExists($calculators);
+        TripCalculatorGuards::guardAirwayTimeCalculatorExists($calculators);
 
-        /** @var AircraftPricingCalculator[] $legCalculators */
-        $legCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::LEG);
-        /** @var AircraftPricingCalculator[] $legMarginCalculators */
-        $legMarginCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::LEG_MARGIN);
-        /** @var AircraftPricingCalculator[] $tripCalculators */
-        $tripCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::TRIP);
-        /** @var AircraftPricingCalculator[] $tripMarginCalculators */
-        $tripMarginCalculators = array_filter($calculators, fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->getValue() === AircraftPricingCalculatorType::TRIP_MARGIN);
+        $legCalculators = $this->selectCalculators($calculators, new AircraftPricingCalculatorType(AircraftPricingCalculatorType::LEG));
+        $legMarginCalculators = $this->selectCalculators($calculators, new AircraftPricingCalculatorType(AircraftPricingCalculatorType::LEG_MARGIN));
+        $tripCalculators = $this->selectCalculators($calculators, new AircraftPricingCalculatorType(AircraftPricingCalculatorType::TRIP));
+        $tripMarginCalculators = $this->selectCalculators($calculators, new AircraftPricingCalculatorType(AircraftPricingCalculatorType::TRIP_MARGIN));
 
         foreach ($trip->getFlights() as $flight) {
             $flightDetails = ['calculators' => []];
-            $legPrice = 0;
-            $legTaxable = 0;
+            $legPrice = new Wallet();
+            $legTaxable = new Wallet();
             foreach ($legCalculators as $legCalculator) {
                 $price = $this->flightCalculatorService->calculatePrice($flight, $legCalculator);
                 if (null === $price)
@@ -70,80 +54,88 @@ final class TripCalculatorService
 
                 switch ($legCalculator->getProperties()->getTax()->getValue()) {
                     case values\AircraftPricingCalculatorTax::IS_TAXABLE:
-                        $legTaxable += $price->getAmount();
-                        $taxable += $price->getAmount();
+                        $legTaxable->addMoney($price);
+                        $taxable->addMoney($price);
                         break;
                     case values\AircraftPricingCalculatorTax::IS_TAX:
-                        $details['tax'][] = DetailedPrice::fromMoneyAmount($price)->setDetails($legCalculator->jsonSerialize());
+                        $details['tax'][] = (new DetailedWallet([$price]))->setDetails($legCalculator->jsonSerialize());
                         break;
                 }
 
-                $flightDetails['calculators'][] = DetailedPrice::fromMoneyAmount($price)->setDetails($legCalculator->jsonSerialize());
-                $legPrice += $price->getAmount();
+                $flightDetails['calculators'][] = (new DetailedWallet([$price]))->setDetails($legCalculator->jsonSerialize());
+                $legPrice->addMoney($price);
             }
 
-            if ($legTaxable > 0) {
-                $marginPrice = 0;
-                foreach ($legMarginCalculators as $legMarginCalculator) {
-                    $margin = $this->flightCalculatorService->calculateMargin($flight, $legMarginCalculator, new MoneyAmount($legTaxable, new Currency(Currency::EUR)));
-                    if (null === $margin)
-                        continue;
-                    $marginPrice += $margin->getAmount();
-                    $flightDetails['calculators'][] = DetailedPrice::fromMoneyAmount($margin)->setDetails($legMarginCalculator->jsonSerialize());
-                }
-                $legPrice += $marginPrice;
+            $marginPrice = new Wallet();
+            foreach ($legMarginCalculators as $legMarginCalculator) {
+                $margin = $this->flightCalculatorService->calculateMargin($flight, $legMarginCalculator, $legTaxable);
+                if (null === $margin)
+                    continue;
+                $marginPrice->addWallet($margin);
+                $flightDetails['calculators'][] = DetailedWallet::fromWallet($margin)->setDetails($legMarginCalculator->jsonSerialize());
             }
+            $legPrice->addWallet($marginPrice);
 
-            $legsPrice += $legPrice;
-            $details['flights'][] = (new DetailedPrice($legPrice, new Currency(Currency::EUR)))->setDetails($flightDetails);
+            $legsPrice->addWallet($legPrice);
+            $details['flights'][] = DetailedWallet::fromWallet($legPrice)->setDetails($flightDetails);
         }
 
         $tripPrice = array_reduce(
             $tripCalculators,
-            function (float $initial, AircraftPricingCalculator $tripCalculator) use ($trip, &$details, &$taxable, &$tax) {
+            function (Wallet $initial, AircraftPricingCalculator $tripCalculator) use ($trip, &$details, &$taxable, &$tax) {
                 if (!$this->checkCalculatorFilters($trip, $tripCalculator))
                     return $initial;
 
-                $amount = $this->extractPrice($trip, $tripCalculator) * $this->roundService->applyRoundMethod(
+                $amount = $tripCalculator->getProperties()->getPrice()->multiply(
+                    $this->roundService->applyRoundMethod(
                         $this->unitExtractor->extractUnit($trip, $tripCalculator->getProperties()->getUnit()->getValue()),
                         $tripCalculator->getProperties()->getRound()->getValue()
-                    );
+                    )
+                );
 
                 switch ($tripCalculator->getProperties()->getTax()->getValue()) {
                     case values\AircraftPricingCalculatorTax::IS_TAXABLE:
-                        $taxable += $amount;
+                        $taxable->addMoney($amount);
                         break;
                     case values\AircraftPricingCalculatorTax::IS_TAX:
-                        $details['tax'][] = (new DetailedPrice($amount, new Currency(Currency::EUR)))->setDetails($tripCalculator->jsonSerialize());
+                        $details['tax'][] = (new DetailedWallet([$amount]))->setDetails($tripCalculator->jsonSerialize());
                         break;
                 }
 
-                $details['trip'][] = (new DetailedPrice($amount, new Currency(Currency::EUR)))->setDetails($tripCalculator->jsonSerialize());
-                return $initial + $amount;
+                $details['trip'][] = (new DetailedWallet([$amount]))->setDetails($tripCalculator->jsonSerialize());
+                return $initial->addMoney($amount);
             },
-            0.0
+            new Wallet()
         );
 
         $taxPrice = array_reduce(
             $tripMarginCalculators,
-            function (float $initial, AircraftPricingCalculator $taxCalculator) use ($trip, &$details, $taxable) {
-                $amount = $this->extractPrice($trip, $taxCalculator) * $taxable / 100;
-                $details['tax'][] = (new DetailedPrice($amount, new Currency(Currency::EUR)))->setDetails($taxCalculator->jsonSerialize());
-                return $initial + $amount;
+            function (Wallet $initial, AircraftPricingCalculator $taxCalculator) use ($trip, &$details, $taxable) {
+                $amount = $taxable->multiply($taxCalculator->getProperties()->getPercent() / 100);
+                $details['tax'][] = DetailedWallet::fromWallet($amount)->setDetails($taxCalculator->jsonSerialize());
+                return $initial->addWallet($amount);
             },
-            0.0
+            new Wallet()
         );
 
-        $result = floor($legsPrice + $tripPrice + $taxPrice);
-        if ($minPrice && ($result < $minPrice->getAmount()))
-            $result = $minPrice->getAmount();
-
-        return (new DetailedPrice($result, new Currency(Currency::EUR)))->setDetails($details);
+        return (new DetailedWallet())
+            ->addWallet($legsPrice)
+            ->addWallet($tripPrice)
+            ->addWallet($taxPrice)
+            ->setDetails($details);
     }
 
-    private function extractPrice(TripDecomposition $trip, AircraftPricingCalculator $calculator): float
+    /**
+     * @param AircraftPricingCalculator[] $calculators
+     * @param AircraftPricingCalculatorType $calculatorType
+     * @return AircraftPricingCalculator[]
+     */
+    private function selectCalculators(array $calculators, AircraftPricingCalculatorType $calculatorType): array
     {
-        return $calculator->getProperties()->getPrice()->getAmount();
+        return array_filter(
+            $calculators,
+            fn(AircraftPricingCalculator $calculator) => $calculator->getProperties()->getType()->equalTo($calculatorType)
+        );
     }
 
     private function checkCalculatorFilters(TripDecomposition $trip, AircraftPricingCalculator $calculator): bool
@@ -155,21 +147,5 @@ final class TripCalculatorService
                 return false;
         }
         return true;
-    }
-
-    /**
-     * Защита от дурака #FT-2536
-     * @param AircraftPricingCalculator[] $calculators
-     * @return void
-     * @throws AircraftPricingBadConfigurationException
-     */
-    private function guardAirwayTimeCalculatorExists(array $calculators)
-    {
-        foreach ($calculators as $calculator) {
-            if ($calculator->getProperties()->getUnit()->getValue() === values\AircraftPricingCalculatorUnit::AIRWAY_TIME)
-                return;
-        }
-
-        throw new AircraftPricingBadConfigurationException();
     }
 }

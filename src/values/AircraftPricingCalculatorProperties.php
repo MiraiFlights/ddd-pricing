@@ -13,11 +13,11 @@ final class AircraftPricingCalculatorProperties
     private AircraftPricingCalculatorUnit $unit;
     private AircraftPricingCalculatorTax $tax;
     private AircraftPricingCalculatorRound $round;
-    private MoneyAmount $price;
-
+    private ?MoneyAmount $price = null;
+    private ?int $percent = null;
     private ?AircraftPricingProfileID $aircraftPricingProfileID = null;
 
-    public function __construct(AircraftPricingCalculatorType $type, AircraftPricingCalculatorName $name, array $conditions, array $filters, AircraftPricingCalculatorUnit $unit, AircraftPricingCalculatorTax $tax, AircraftPricingCalculatorRound $round, MoneyAmount $price)
+    public function __construct(AircraftPricingCalculatorType $type, AircraftPricingCalculatorName $name, array $conditions, array $filters, AircraftPricingCalculatorUnit $unit, AircraftPricingCalculatorTax $tax, AircraftPricingCalculatorRound $round)
     {
         $this->type = $type;
         $this->name = $name;
@@ -26,7 +26,6 @@ final class AircraftPricingCalculatorProperties
         $this->unit = $unit;
         $this->tax = $tax;
         $this->round = $round;
-        $this->price = $price;
     }
 
     /**
@@ -86,11 +85,39 @@ final class AircraftPricingCalculatorProperties
     }
 
     /**
-     * @return MoneyAmount
+     * @return MoneyAmount|null
      */
-    public function getPrice(): MoneyAmount
+    public function getPrice(): ?MoneyAmount
     {
         return $this->price;
+    }
+
+    /**
+     * @param MoneyAmount|null $price
+     * @return AircraftPricingCalculatorProperties
+     */
+    public function setPrice(?MoneyAmount $price): AircraftPricingCalculatorProperties
+    {
+        $this->price = $price;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPercent(): ?int
+    {
+        return $this->percent;
+    }
+
+    /**
+     * @param int|null $percent
+     * @return AircraftPricingCalculatorProperties
+     */
+    public function setPercent(?int $percent): AircraftPricingCalculatorProperties
+    {
+        $this->percent = $percent;
+        return $this;
     }
 
     /**

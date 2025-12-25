@@ -6,6 +6,7 @@ use ddd\adapter\Trip\domain\aggregates\FlightDecomposition;
 use ddd\pricing\entities\AircraftPricingCalculator;
 use unapi\helper\money\Currency;
 use unapi\helper\money\MoneyAmount;
+use unapi\helper\money\Wallet;
 
 final class FlightCalculatorService
 {
@@ -34,24 +35,23 @@ final class FlightCalculatorService
         if (!$this->checkCalculatorFilters($flight, $calculator))
             return null;
 
-        $price = $this->extractPrice($flight, $calculator) * $this->roundService->applyRoundMethod(
+        return $calculator->getProperties()->getPrice()->multiply(
+            $this->roundService->applyRoundMethod(
                 $this->unitExtractor->extractUnit($flight, $calculator->getProperties()->getUnit()->getValue()),
                 $calculator->getProperties()->getRound()->getValue()
-            );
-
-        return new MoneyAmount($price, new Currency(Currency::EUR));
+            )
+        );
     }
 
-    public function calculateMargin(FlightDecomposition $flight, AircraftPricingCalculator $calculator, MoneyAmount $sourcePrice): ?MoneyAmount
+    public function calculateMargin(FlightDecomposition $flight, AircraftPricingCalculator $calculator, Wallet $sourcePrice): ?Wallet
     {
         if (!$this->conditionsChecker->checkCalculatorConditions($flight, $calculator))
             return null;
         if (!$this->checkCalculatorFilters($flight, $calculator))
             return null;
 
-        return new MoneyAmount(
-            $sourcePrice->getAmount() * $this->extractPrice($flight, $calculator) / 100,
-            $sourcePrice->getCurrency()
+        return $sourcePrice->multiply(
+            $calculator->getProperties()->getPercent() / 100
         );
     }
 
@@ -64,10 +64,5 @@ final class FlightCalculatorService
                 return false;
         }
         return true;
-    }
-
-    private function extractPrice(FlightDecomposition $flight, AircraftPricingCalculator $calculator): float
-    {
-        return $calculator->getProperties()->getPrice()->getAmount();
     }
 }
