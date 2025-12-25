@@ -53,7 +53,9 @@ final class AircraftPricingCalculator implements \JsonSerializable
                 'id' => $this->getId()->getValue(),
                 'type_id' => $this->getProperties()->getType()->getValue(),
                 'name' => $this->getProperties()->getName()->getValue(),
-                'price' => $this->getProperties()->getPrice()->getAmount(),
+                'price' => $this->getProperties()?->getPrice()->getAmount(),
+                'currency' => $this->getProperties()?->getPrice()->getCurrency()->value,
+                'percent' => $this->getProperties()?->getPercent(),
                 'pricingProfileId' => $this->getProperties()->getAircraftPricingProfileID()?->getValue(),
             ],
             array_filter([
