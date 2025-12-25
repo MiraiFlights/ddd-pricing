@@ -5,6 +5,7 @@ namespace ddd\pricing\fabrics;
 use ddd\pricing\entities;
 use ddd\pricing\mappers\AircraftPricingProfileCalculatorTypeMapper;
 use ddd\pricing\values;
+use unapi\helper\money\Currency;
 use unapi\helper\money\MoneyAmount;
 use yii\helpers\ArrayHelper;
 
@@ -41,7 +42,7 @@ final class AircraftPricingProfileCalculatorFabric
             ->setAircraftPricingProfileID(new values\AircraftPricingProfileID(ArrayHelper::getValue($data, 'pricing_profile_id')));
 
        if (in_array($type->getValue(), [values\AircraftPricingCalculatorType::LEG, values\AircraftPricingCalculatorType::TRIP])) {
-            $properties->setPrice(new MoneyAmount((float)ArrayHelper::getValue($data, 'price'), ArrayHelper::getValue($data, 'currency')));
+            $properties->setPrice(new MoneyAmount((float)ArrayHelper::getValue($data, 'price'), new Currency(ArrayHelper::getValue($data, 'currency'))));
         } else {
            $properties->setPercent(ArrayHelper::getValue($data, 'percent'));
        }

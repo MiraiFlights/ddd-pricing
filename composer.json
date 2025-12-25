@@ -8,7 +8,7 @@
     "php": ">=8.0",
     "ext-json": "*",
     "rubin/ddd-domain": "^1.0",
-    "unapi/helper-money": "^1.0",
+    "unapi/helper-money": "^1.3",
     "rubin/enum": "^1.0",
     "psr/log": "^1.1",
     "rubin/ddd-uuid": "^1.0",
